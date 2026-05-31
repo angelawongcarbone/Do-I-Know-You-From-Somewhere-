@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Do I Know You From Somewhere?</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=DM+Serif+Display:ital@0;1&family=Space+Mono&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --c-black:#261f25;--c-navy:#2e2530;--c-lavender:#659a95;--c-mauve:#c4a8b0;
+  --c-slate:#528096;--c-purple:#528096;--c-brown:#3a2a38;--c-charcoal:#3a2e38;
+  --c-pink:#c76652;--c-light:#e8dce0;--c-green:#4a5840;
+  --t-main:#e8dce0;--t-dim:rgba(232,220,224,0.52);--t-accent:#659a95;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--c-black);color:var(--t-main);font-family:'DM Serif Display',serif;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");background-size:200px;pointer-events:none;z-index:9999;opacity:0.6;}
+
+/* ── LANDING ── */
+#landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--c-black);padding:48px 24px 60px;}
+.landing-eyebrow{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.35em;text-transform:uppercase;color:var(--t-dim);margin-bottom:32px;}
+.landing-title{font-family:'Besley',serif;font-weight:900;font-size:clamp(38px,8vw,88px);color:var(--c-light);text-align:center;line-height:1.05;margin-bottom:8px;}
+.landing-title-sub{font-family:'Besley',serif;font-style:italic;font-weight:400;font-size:clamp(13px,2vw,18px);color:var(--c-lavender);text-align:center;margin-bottom:40px;letter-spacing:0.04em;}
+
+/* shop window grid — the grid layout works fine for the landing since it's its own flex child */
+.shop-window{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;max-width:480px;width:100%;background:var(--c-charcoal);border:1px solid rgba(184,168,200,0.18);margin-bottom:36px;}
+/* floating mannequin cells */
+.shop-cell{background:var(--c-navy);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:20px 8px 14px;cursor:pointer;transition:background 0.25s;}
+.shop-cell:nth-child(1){animation:float1 4.2s ease-in-out infinite;}
+.shop-cell:nth-child(2){animation:float2 3.8s ease-in-out infinite;}
+.shop-cell:nth-child(3){animation:float3 4.6s ease-in-out infinite;}
+.shop-cell:nth-child(4){animation:float4 4.0s ease-in-out infinite;}
+.shop-cell:nth-child(5){animation:float5 3.6s ease-in-out infinite;}
+.shop-cell:nth-child(6){animation:float6 4.4s ease-in-out infinite;}
+.shop-cell:hover{background:#2e2530;animation-play-state:paused;}
+.shop-cell:hover .shead{filter:drop-shadow(0 0 10px rgba(101,154,149,0.6));}
+
+@keyframes float1{0%,100%{transform:translateY(0px);}50%{transform:translateY(-10px);}}
+@keyframes float2{0%,100%{transform:translateY(-6px);}50%{transform:translateY(6px);}}
+@keyframes float3{0%,100%{transform:translateY(-3px);}50%{transform:translateY(-13px);}}
+@keyframes float4{0%,100%{transform:translateY(0px);}50%{transform:translateY(-8px);}}
+@keyframes float5{0%,100%{transform:translateY(-8px);}50%{transform:translateY(4px);}}
+@keyframes float6{0%,100%{transform:translateY(-4px);}50%{transform:translateY(-12px);}}
+.shead{width:80px;height:110px;transition:filter 0.25s;display:block;margin:0 auto;}
+.shop-tag{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--t-dim);margin-top:10px;text-align:center;border-top:1px solid rgba(184,168,200,0.15);padding-top:8px;width:100%;}
+
+/* ── TV with real PNG ── */
+.tv-container{position:relative;width:480px;max-width:90vw;margin-bottom:36px;cursor:default;}
+.tv-container img.tv-png{width:100%;display:block;}
+/* Screen area: positioned to match the CRT bezel in the Samsung photo.
+   These % values place the GIF inside the rounded screen opening. */
+.tv-gif-overlay{
+  position:absolute;
+  /* tweak these to fit the screen precisely */
+  top:6%;
+  left:5%;
+  width:71%;
+  height:82%;
+  overflow:hidden;
+  border-radius:6% / 8%;
+  mix-blend-mode:multiply; /* darkens edges, blends into bezel */
+}
+.tv-gif-overlay img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0.88;
+  filter:contrast(1.05) brightness(0.92);
+}
+/* scanlines over gif */
+.tv-gif-overlay::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0.12) 0px,rgba(0,0,0,0.12) 1px,transparent 1px,transparent 3px);
+  pointer-events:none;
+  z-index:2;
+}
+
+.enter-btn{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--c-light);border:1px solid rgba(216,204,216,0.3);padding:12px 36px;background:transparent;cursor:pointer;transition:all 0.2s;}
+.enter-btn:hover{background:rgba(216,204,216,0.08);border-color:var(--c-lavender);}
+
+/* ── MAIN SITE ── */
+#main-site{display:none;}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(38,31,37,0.93);backdrop-filter:blur(6px);border-bottom:1px solid rgba(101,154,149,0.2);padding:6px 0 4px;}
+.nav-inner{max-width:1000px;margin:0 auto;display:flex;justify-content:center;gap:4px;flex-wrap:wrap;padding:0 12px;}
+.nav-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;gap:3px;transition:transform 0.2s;text-decoration:none;}
+.nav-item:hover{transform:translateY(-4px) scale(1.06);}
+.nav-item:hover .mhead{filter:drop-shadow(0 0 8px rgba(184,168,200,0.6));}
+.mhead{width:54px;height:74px;transition:filter 0.25s;}
+.nav-label{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:0.12em;text-transform:uppercase;color:var(--t-dim);text-align:center;line-height:1.3;}
+
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:130px 24px 80px;position:relative;overflow:hidden;border:none;max-width:100%;}
+#hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(122,88,136,0.1) 0%,transparent 65%);pointer-events:none;}
+.hero-eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.3em;color:var(--c-lavender);text-transform:uppercase;margin-bottom:28px;}
+.hero-title{font-family:'Besley',serif;font-weight:900;font-size:clamp(52px,11vw,118px);line-height:0.93;color:var(--c-light);max-width:920px;margin-bottom:16px;}
+.hero-script{font-family:'DM Serif Display',serif;font-style:italic;font-weight:400;font-size:1.08em;color:var(--c-lavender);letter-spacing:0.02em;}
+.hero-title-italic{font-family:'Besley',serif;font-style:italic;font-weight:700;font-size:clamp(22px,4.5vw,52px);color:var(--c-lavender);letter-spacing:0.01em;margin-bottom:36px;display:block;}
+.hero-rule{width:1px;height:60px;background:rgba(184,168,200,0.3);margin:0 auto 36px;}
+.hero-tagline{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(13px,2vw,17px);color:var(--t-dim);margin-bottom:48px;max-width:440px;line-height:1.7;}
+.scroll-hint{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.25em;color:rgba(184,168,200,0.3);text-transform:uppercase;animation:pulse 2.5s infinite;}
+@keyframes pulse{0%,100%{opacity:0.3;}50%{opacity:0.9;}}
+
+section{max-width:860px;margin:0 auto;padding:96px 32px;border-top:1px solid rgba(184,168,200,0.1);}
+.section-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--t-dim);margin-bottom:16px;}
+.section-title{font-family:'Besley',serif;font-weight:900;font-size:clamp(40px,6vw,70px);color:var(--c-light);line-height:1;margin-bottom:28px;}
+.section-body{font-size:16px;line-height:1.9;color:var(--t-dim);max-width:580px;}
+
+.trailer-frame{width:100%;aspect-ratio:16/9;background:var(--c-navy);border:1px solid rgba(184,168,200,0.15);margin-top:40px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer;}
+.trailer-frame::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(122,88,136,0.15),rgba(14,13,18,0.75));}
+.play-btn{width:68px;height:68px;border:1.5px solid var(--c-lavender);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;transition:all 0.2s;}
+.trailer-frame:hover .play-btn{background:var(--c-lavender);}
+.play-btn::after{content:'';width:0;height:0;border-style:solid;border-width:12px 0 12px 22px;border-color:transparent transparent transparent var(--c-lavender);margin-left:4px;transition:border-color 0.2s;}
+.trailer-frame:hover .play-btn::after{border-left-color:var(--c-black);}
+.trailer-label{position:absolute;bottom:18px;left:22px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t-dim);z-index:1;}
+
+.press-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-top:40px;}
+.press-card{border:1px solid rgba(184,168,200,0.15);padding:22px;position:relative;}
+.press-card::before{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--c-purple);}
+.press-quote{font-style:italic;font-size:15px;line-height:1.75;color:var(--c-light);margin-bottom:12px;}
+.press-source{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--c-lavender);}
+.screening-list{margin-top:40px;}
+.screening-item{display:flex;align-items:center;gap:24px;padding:16px 0;border-bottom:1px solid rgba(184,168,200,0.1);}
+.screening-date{font-family:'Besley',serif;font-weight:900;font-size:24px;color:var(--c-lavender);min-width:120px;line-height:1.2;}
+.screening-info{font-size:14px;line-height:1.5;color:var(--c-light);}
+.screening-city{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--t-dim);margin-top:2px;}
+.award-card{border:1px solid rgba(184,168,200,0.15);padding:18px 20px;}
+.award-cat{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:var(--c-lavender);margin-bottom:8px;}
+.award-fest{font-family:'Besley',serif;font-weight:700;font-size:15px;color:var(--c-light);line-height:1.3;}
+.award-year{font-family:'Space Mono',monospace;font-size:8px;color:var(--t-dim);margin-top:4px;}
+
+.carousel{position:relative;display:flex;align-items:center;gap:12px;margin-top:40px;}
+.car-track-wrap{flex:1;overflow:hidden;}
+.car-track{display:flex;transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);}
+.car-slide{flex:0 0 100%;position:relative;aspect-ratio:16/9;cursor:pointer;overflow:hidden;border:1px solid rgba(184,168,200,0.12);}
+.car-slide-bg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transition:transform 0.3s;}
+.car-slide:hover .car-slide-bg{transform:scale(1.025);}
+.car-slide-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(14,13,18,0);transition:background 0.25s;gap:8px;}
+.car-slide:hover .car-slide-overlay{background:rgba(14,13,18,0.55);}
+.car-open-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--c-lavender);opacity:0;transition:opacity 0.25s;}
+.car-slide:hover .car-open-label{opacity:1;}
+.car-caption{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(216,204,216,0.6);opacity:0;transition:opacity 0.25s;}
+.car-slide:hover .car-caption{opacity:1;}
+.car-btn{background:transparent;border:1px solid rgba(184,168,200,0.25);color:var(--c-lavender);font-size:18px;width:40px;height:40px;cursor:pointer;flex-shrink:0;transition:all 0.2s;display:flex;align-items:center;justify-content:center;line-height:1;}
+.car-btn:hover{background:rgba(184,168,200,0.1);border-color:var(--c-lavender);}
+.car-dots{display:flex;justify-content:center;gap:8px;margin-top:16px;}
+.car-dot{width:5px;height:5px;border-radius:50%;background:rgba(184,168,200,0.25);cursor:pointer;transition:background 0.2s;border:none;}
+.car-dot.active{background:var(--c-lavender);}
+
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:22px;margin-top:40px;}
+.team-card{display:flex;flex-direction:column;gap:10px;}
+.team-photo{width:100%;aspect-ratio:3/4;background:var(--c-navy);border:1px solid rgba(184,168,200,0.15);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.team-photo-link{display:block;text-decoration:none;}
+.team-photo-hover{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(14,13,18,0.7);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--c-lavender);opacity:0;transition:opacity 0.2s;}
+.team-photo-link:hover .team-photo-hover{opacity:1;}
+.team-photo-link:hover .team-photo{border-color:rgba(184,168,200,0.4);}
+.team-photo-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0.1;font-size:60px;}
+.team-name{font-family:'Besley',serif;font-weight:700;font-size:20px;color:var(--c-light);}
+.team-role{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t-dim);}
+.about-pull{font-family:'Besley',serif;font-style:italic;font-weight:700;font-size:clamp(20px,3.5vw,36px);color:var(--c-light);line-height:1.3;margin-bottom:32px;border-left:2px solid var(--c-purple);padding-left:20px;}
+.contact-form{display:flex;flex-direction:column;gap:14px;margin-top:40px;max-width:540px;}
+.cf-row{display:flex;gap:14px;flex-wrap:wrap;}
+.cf-field{flex:1;min-width:190px;display:flex;flex-direction:column;gap:5px;}
+.cf-field label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--t-dim);}
+.cf-field input,.cf-field textarea,.cf-field select{background:rgba(28,29,46,0.7);border:1px solid rgba(184,168,200,0.2);color:var(--c-light);font-family:'DM Serif Display',serif;font-size:14px;padding:10px 13px;outline:none;transition:border-color 0.2s;appearance:none;}
+.cf-field input:focus,.cf-field textarea:focus,.cf-field select:focus{border-color:var(--c-lavender);}
+.cf-field textarea{resize:vertical;min-height:110px;}
+.cf-field select option{background:var(--c-navy);}
+.cf-submit{display:inline-block;background:var(--c-purple);color:var(--c-light);font-family:'Besley',serif;font-weight:700;font-size:17px;letter-spacing:0.06em;padding:13px 38px;border:none;cursor:pointer;transition:background 0.2s,transform 0.1s;align-self:flex-start;margin-top:6px;}
+.cf-submit:hover{background:var(--c-lavender);color:var(--c-black);}
+.cf-submit:active{transform:scale(0.98);}
+
+/* footer tv */
+footer{text-align:center;padding:60px 24px 48px;border-top:1px solid rgba(184,168,200,0.1);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(184,168,200,0.22);}
+.footer-tv{position:fixed;bottom:20px;right:20px;width:280px;max-width:35vw;z-index:500;}
+.footer-tv img.tv-png{width:100%;display:block;}
+.footer-tv .tv-gif-overlay{position:absolute;top:6%;left:5%;width:71%;height:82%;overflow:hidden;border-radius:6% / 8%;mix-blend-mode:multiply;}
+.footer-tv .tv-gif-overlay img{width:100%;height:100%;object-fit:cover;opacity:0.88;filter:contrast(1.05) brightness(0.92);}
+.footer-tv .tv-gif-overlay::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.12) 0px,rgba(0,0,0,0.12) 1px,transparent 1px,transparent 3px);pointer-events:none;z-index:2;}
+</style>
+</head>
+<body>
+
+<!-- SVG dither filter — referenced by CSS filter:url(#dither) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;">
+  <defs>
+    <filter id="dither" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <!-- fine high-frequency noise — small particles not warping -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" seed="12" result="noise"/>
+      <!-- desaturate to greyscale -->
+      <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+      <!-- threshold into sharp on/off particles — adjust tableValues middle point to control density -->
+      <feComponentTransfer in="grey" result="particles">
+        <feFuncA type="table" tableValues="0 0 0 1 1 1 1 1 1 1"/>
+      </feComponentTransfer>
+      <!-- use particles as alpha mask on the source text — no displacement, pure dissolve -->
+      <feComposite in="SourceGraphic" in2="particles" operator="in"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ═══════════════════ LANDING ═══════════════════ -->
+<div id="landing">
+  <p class="landing-eyebrow">Soft Service Stand Ins, LLC &nbsp;·&nbsp; 2026</p>
+  <h1 class="landing-title"><span style="color:#c76652;">DO</span> <em class="hero-script">I</em> KNOW <em class="hero-script">You</em><br><span style="color:#c76652;">From</span> <em class="hero-script" style="color:#ffffff;-webkit-text-fill-color:#ffffff;">Somewhere?</em></h1>
+  <p class="landing-title-sub">A film in six identities</p>
+
+  <div class="shop-window" id="shop"></div>
+
+  <!-- TV with real PNG + GIF composited into screen -->
+  <div class="tv-container">
+    <img class="tv-png" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Samsung_Celebrity_TV.jpg/1280px-Samsung_Celebrity_TV.jpg" alt="Vintage TV"/>
+    <div class="tv-gif-overlay">
+      <img src="https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyeWY0c2t0cHN0c211YmY3aWVieGl1a3BqdHc0Ymg4aTZydXp4NTRxbiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jUQt9UuT3EzUT0USKU/200w.gif" alt="film clip"/>
+    </div>
+  </div>
+
+  <button class="enter-btn" onclick="enterSite('hero')">Enter &nbsp;→</button>
+</div>
+
+<!-- ═══════════════════ MAIN SITE ═══════════════════ -->
+<div id="main-site">
+<nav><div class="nav-inner" id="navinner"></div></nav>
+
+<section id="hero" style="border:none;max-width:100%;padding-left:0;padding-right:0;">
+  <p class="hero-eyebrow">A Series Proof-of-Concept &nbsp;·&nbsp; 2026</p>
+  <h1 class="hero-title"><span style="color:#c76652;filter:url(#dither);">DO</span> <em class="hero-script">I</em> KNOW <em class="hero-script">You</em><br><span style="color:#c76652;filter:url(#dither);">FROM</span></h1>
+  <span class="hero-title-italic" style="color:#ffffff;-webkit-text-fill-color:#ffffff;">Somewhere?</span>
+  <div class="hero-rule"></div>
+  <p class="hero-tagline">"She could be anyone.<br>That was the point."</p>
+  <p class="scroll-hint">▾ &nbsp; scroll</p>
+</section>
+
+<section id="trailer">
+  <h2 class="section-title">Watch the Trailer</h2>
+  <div class="trailer-frame" onclick="this.innerHTML='<iframe width=\'100%\' height=\'100%\' src=\'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1\' frameborder=\'0\' allow=\'autoplay\' allowfullscreen></iframe>'">
+    <div class="play-btn"></div>
+    <span class="trailer-label">Official Trailer — 2:34</span>
+  </div>
+</section>
+
+<section id="press">
+  <h2 class="section-title">Press &amp; Screenings</h2>
+  <div class="press-grid">
+    <div class="press-card"><p class="press-quote">"A mesmerizing study in identity and performance. One of the year's most arresting debuts."</p><p class="press-source">— Variety</p></div>
+    <div class="press-card"><p class="press-quote">"Haunting, stylish, genuinely unnerving. The kind of film that lingers long after the credits."</p><p class="press-source">— The Hollywood Reporter</p></div>
+    <div class="press-card"><p class="press-quote">"A precise and eerie thriller that asks who we become when no one is watching."</p><p class="press-source">— IndieWire</p></div>
+  </div>
+  <div class="screening-list" style="margin-top:56px;">
+    <p class="section-label" style="margin-bottom:14px;">Upcoming Screenings</p>
+    <div class="screening-item">
+      <div class="screening-date">10 @ 5:30PM<br><span style="font-size:10px;font-family:'Space Mono',monospace;letter-spacing:0.1em;font-weight:400;">JUN</span></div>
+      <div><div class="screening-info">Tribeca Film Festival</div><div class="screening-city">New York, NY</div></div>
+    </div>
+  </div>
+  <div style="margin-top:72px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+      <div class="award-card" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <img src="https://media.istockphoto.com/id/1347523640/photo/tribeca-film-festival-2021.jpg" 
+             alt="Vital Stories — Tribeca" 
+             style="width:100px;height:auto;flex-shrink:0;border-radius:2px;opacity:0.92;"/>
+        <div>
+          <div class="award-cat">Winner — Vital Stories Grant</div>
+          <div class="award-fest">Tribeca Film Festival</div>
+          <div class="award-year">2026 — Official Selection</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="gallery">
+  <h2 class="section-title">Stills and BTS</h2>
+  <div class="carousel" id="carousel">
+    <button class="car-btn" onclick="carMove(-1)">&#8592;</button>
+    <div class="car-track-wrap"><div class="car-track" id="carTrack"></div></div>
+    <button class="car-btn" onclick="carMove(1)">&#8594;</button>
+  </div>
+  <div class="car-dots" id="carDots"></div>
+  <p style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--t-dim);text-align:center;margin-top:12px;">Click for full size</p>
+</section>
+
+<section id="team">
+  <h2 class="section-title">Meet the Team at Soft Service Stand Ins</h2>
+  <div class="team-grid">
+    <div class="team-card"><a href="https://yourwebsite.com" target="_blank" class="team-photo-link"><div class="team-photo"><div class="team-photo-bg">◈</div><div class="team-photo-hover">Visit Site</div></div></a><div class="team-name">Your Name</div><div class="team-role">Writer / Lead Actress</div></div>
+    <div class="team-card"><a href="https://directorwebsite.com" target="_blank" class="team-photo-link"><div class="team-photo" style="background:#1c1d2e;"><div class="team-photo-bg">◇</div><div class="team-photo-hover">Visit Site</div></div></a><div class="team-name">Director Name</div><div class="team-role">Director</div></div>
+    <div class="team-card"><a href="https://producerwebsite.com" target="_blank" class="team-photo-link"><div class="team-photo" style="background:#1c1820;"><div class="team-photo-bg">◆</div><div class="team-photo-hover">Visit Site</div></div></a><div class="team-name">Producer Name</div><div class="team-role">Producer</div></div>
+    <div class="team-card"><a href="https://dpwebsite.com" target="_blank" class="team-photo-link"><div class="team-photo" style="background:#181c1c;"><div class="team-photo-bg">◉</div><div class="team-photo-hover">Visit Site</div></div></a><div class="team-name">DP Name</div><div class="team-role">Cinematographer</div></div>
+  </div>
+</section>
+
+<section id="about">
+  <h2 class="section-title">About</h2>
+  <p class="about-pull">Who do you become<br>when the people closest to you<br>don't recognize you anymore?</p>
+  <p class="section-body"><em>Do I Know You From Somewhere?</em><br><br>
+  <em>Logline:</em> Facing her mother's Alzheimer's diagnosis and the crushing cost of care, struggling actor Kimmy takes a clandestine, lucrative side gig impersonating strangers' loved ones. As her mother's symptoms and the dangers of her job escalate, Kimmy must decide who she's willing to become to keep her mother safe.<br><br>
+  Shot in New York and North Carolina, the film is a meditation on selfhood, performance, and the dual identity of caretakers and people living with progressive cognitive decline.</p>
+  <div style="margin-top:44px;display:flex;gap:36px;flex-wrap:wrap;">
+    <div><p style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.22em;text-transform:uppercase;color:var(--t-dim);margin-bottom:5px;">Runtime</p><p style="font-family:'Besley',serif;font-weight:700;font-size:22px;color:var(--c-light);">26 minutes</p></div>
+    <div><p style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.22em;text-transform:uppercase;color:var(--t-dim);margin-bottom:5px;">Format</p><p style="font-family:'Besley',serif;font-weight:700;font-size:22px;color:var(--c-light);">4K DCP</p></div>
+    <div><p style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.22em;text-transform:uppercase;color:var(--t-dim);margin-bottom:5px;">Language</p><p style="font-family:'Besley',serif;font-weight:700;font-size:22px;color:var(--c-light);">English, Mandarin</p></div>
+    <div><p style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.22em;text-transform:uppercase;color:var(--t-dim);margin-bottom:5px;">Year</p><p style="font-family:'Besley',serif;font-weight:700;font-size:22px;color:var(--c-light);">2026</p></div>
+  </div>
+</section>
+
+<section id="contact">
+  <h2 class="section-title">Get in Touch</h2>
+  <p class="section-body">For press inquiries, screening requests, or distribution, reach out below.</p>
+  <form class="contact-form" onsubmit="mailtoSubmit(event)">
+    <div class="cf-row">
+      <div class="cf-field"><label>Name</label><input type="text" placeholder="Your name"/></div>
+      <div class="cf-field"><label>Email</label><input type="email" placeholder="your@email.com"/></div>
+    </div>
+    <div class="cf-field"><label>Inquiry Type</label><select><option>Press</option><option>Screening Request</option><option>Distribution</option><option>Other</option></select></div>
+    <div class="cf-field"><label>Message</label><textarea placeholder="Tell us about your inquiry..."></textarea></div>
+    <button type="submit" class="cf-submit">Send</button>
+  </form>
+</section>
+
+<footer>
+  <div style="max-width:860px;margin:0 auto;padding:0 32px;">
+    <p style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(184,168,200,0.3);margin-bottom:32px;">Production &amp; Support</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;margin-bottom:48px;">
+      <a href="#" style="display:flex;align-items:center;justify-content:center;width:140px;height:60px;border:1px solid rgba(184,168,200,0.15);text-decoration:none;" onmouseover="this.style.borderColor='rgba(184,168,200,0.4)'" onmouseout="this.style.borderColor='rgba(184,168,200,0.15)'"><span style="font-family:'Besley',serif;font-weight:900;font-size:13px;color:rgba(184,168,200,0.3);text-transform:uppercase;">Your Logo</span></a>
+      <a href="#" style="display:flex;align-items:center;justify-content:center;width:140px;height:60px;border:1px solid rgba(184,168,200,0.15);text-decoration:none;" onmouseover="this.style.borderColor='rgba(184,168,200,0.4)'" onmouseout="this.style.borderColor='rgba(184,168,200,0.15)'"><span style="font-family:'Besley',serif;font-weight:900;font-size:13px;color:rgba(184,168,200,0.3);text-transform:uppercase;">Your Logo</span></a>
+      <a href="#" style="display:flex;align-items:center;justify-content:center;width:140px;height:60px;border:1px solid rgba(184,168,200,0.15);text-decoration:none;" onmouseover="this.style.borderColor='rgba(184,168,200,0.4)'" onmouseout="this.style.borderColor='rgba(184,168,200,0.15)'"><span style="font-family:'Besley',serif;font-weight:900;font-size:13px;color:rgba(184,168,200,0.3);text-transform:uppercase;">Your Logo</span></a>
+    </div>
+
+    <!-- TV in footer -->
+    <div class="footer-tv">
+      <img class="tv-png" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Samsung_Celebrity_TV.jpg/1280px-Samsung_Celebrity_TV.jpg" alt="Vintage TV"/>
+      <div class="tv-gif-overlay">
+        <img src="https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyeWY0c2t0cHN0c211YmY3aWVieGl1a3BqdHc0Ymg4aTZydXp4NTRxbiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jUQt9UuT3EzUT0USKU/200w.gif" alt="film clip"/>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid rgba(184,168,200,0.1);padding-top:28px;">&copy; 2026 &nbsp;·&nbsp; Do I Know You From Somewhere? &nbsp;·&nbsp; All Rights Reserved</div>
+  </div>
+</footer>
+</div>
+
+<script>
+function base(ids){
+  const sk=ids+'sk', nk=ids+'nk';
+  return `<defs>
+    <radialGradient id="${sk}" cx="42%" cy="38%" r="58%"><stop offset="0%" stop-color="#e0d4c8"/><stop offset="100%" stop-color="#b89878"/></radialGradient>
+    <radialGradient id="${nk}" cx="50%" cy="30%" r="60%"><stop offset="0%" stop-color="#ccc0b0"/><stop offset="100%" stop-color="#a88868"/></radialGradient>
+  </defs>
+  <rect x="17" y="73" width="24" height="5" rx="1" fill="#18181e"/>
+  <path d="M9 72 Q13 57 21 54 Q29 52 37 54 Q45 57 49 72Z" fill="url(#${nk})"/>
+  <rect x="23" y="46" width="12" height="13" rx="3" fill="url(#${nk})"/>
+  <ellipse cx="29" cy="31" rx="15" ry="19" fill="url(#${sk})"/>
+  <ellipse cx="24" cy="24" rx="4.5" ry="6.5" fill="rgba(255,255,255,0.07)"/>
+  <ellipse cx="14" cy="32" rx="2" ry="3" fill="#b09070"/>
+  <ellipse cx="44" cy="32" rx="2" ry="3" fill="#b09070"/>
+  <path d="M22 29.5 Q25 28 28 29.5" stroke="#806050" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+  <path d="M30 29.5 Q33 28 36 29.5" stroke="#806050" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+  <path d="M29 31 Q28 35 27 36.5 Q29 37.5 31 36.5 Q30 35 29 31Z" fill="rgba(120,90,65,0.2)"/>
+  <path d="M25 41 Q29 43 33 41" stroke="#907060" stroke-width="1" fill="none" stroke-linecap="round"/>`;
+}
+
+const wigs = {
+  blackStraight:`<path d="M16 24 Q15 12 20 6 Q29 2 38 6 Q43 12 42 24 Q38 8 29 8 Q20 8 16 24Z" fill="#0a0a0c"/><ellipse cx="29" cy="5" rx="6" ry="6" fill="#111014"/><circle cx="29" cy="5" r="4.5" fill="#0a0a0c"/><circle cx="29" cy="5" r="2.5" fill="#1a1a20"/><path d="M23 8 Q29 3 35 8" stroke="#1c1c22" stroke-width="1" fill="none" stroke-linecap="round"/>`,
+  auburnAfro:`<circle cx="29" cy="15" r="15" fill="#8a3010"/><circle cx="14" cy="21" r="9" fill="#7a2808"/><circle cx="44" cy="21" r="9" fill="#7a2808"/><circle cx="8" cy="30" r="7" fill="#6a2006"/><circle cx="50" cy="30" r="7" fill="#6a2006"/><circle cx="19" cy="8" r="8" fill="#a83818"/><circle cx="39" cy="8" r="8" fill="#a83818"/><circle cx="29" cy="4" r="9" fill="#983010"/>`,
+  blueSpiky:`<path d="M14 24 Q13 14 18 8 Q29 3 40 8 Q45 14 44 24 Q40 10 29 10 Q18 10 14 24Z" fill="#1a1a6a"/><path d="M14 22 Q10 18 12 26 Q13 30 15 28 Q14 25 14 22Z" fill="#1a1a6a"/><path d="M44 22 Q48 18 46 26 Q45 30 43 28 Q44 25 44 22Z" fill="#1a1a6a"/><polygon points="20,10 18,0 22,8" fill="#3333cc"/><polygon points="26,7 25,-2 28,6" fill="#2222bb"/><polygon points="32,7 31,-2 34,6" fill="#3333cc"/><polygon points="38,10 36,0 40,8" fill="#2222bb"/><polygon points="23,8 21,1 25,7" fill="#4444dd"/><polygon points="35,8 33,1 37,7" fill="#4444dd"/><path d="M18 14 Q29 9 40 14" stroke="#5555ee" stroke-width="0.8" fill="none" stroke-linecap="round"/>`,
+  whiteBob:`<path d="M16 22 Q15 10 20 5 Q29 1 38 5 Q43 10 42 22 Q38 7 29 7 Q20 7 16 22Z" fill="#5c3420"/><path d="M17 20 Q14 28 16 38 Q17 44 18 50 Q15 43 14 35 Q13 27 15 21Z" fill="#5c3420"/><path d="M41 20 Q44 28 42 38 Q41 44 40 50 Q43 43 44 35 Q45 27 43 21Z" fill="#5c3420"/><path d="M16 30 Q14 34 17 37" stroke="#3e2010" stroke-width="1" fill="none"/><path d="M42 30 Q44 34 41 37" stroke="#3e2010" stroke-width="1" fill="none"/><ellipse cx="29" cy="15" rx="9" ry="4" fill="#7a4830"/><path d="M22 15 Q29 12 36 15" stroke="#5c3420" stroke-width="1.5" fill="none" stroke-linecap="round"/>`,
+  blondeCurly:`<path d="M14 22 Q12 9 18 4 Q29-1 40 4 Q46 9 44 22 Q40 6 29 6 Q18 6 14 22Z" fill="#c8a040"/><circle cx="12" cy="25" r="6" fill="#c8a040"/><circle cx="11" cy="32" r="5.5" fill="#b89038"/><circle cx="12" cy="39" r="5" fill="#c8a040"/><circle cx="13" cy="46" r="4.5" fill="#b89038"/><circle cx="46" cy="25" r="6" fill="#c8a040"/><circle cx="47" cy="32" r="5.5" fill="#b89038"/><circle cx="46" cy="39" r="5" fill="#c8a040"/><circle cx="45" cy="46" r="4.5" fill="#b89038"/><circle cx="20" cy="8" r="7" fill="#d8b048"/><circle cx="38" cy="8" r="7" fill="#d8b048"/><circle cx="29" cy="5" r="8" fill="#c8a040"/>`,
+  pinkPigtails:`<path d="M14 22 Q15 12 29 10 Q43 12 44 22 Q40 14 29 13 Q18 14 14 22Z" fill="#d060a0"/><path d="M15 18 Q10 12 8 5 Q10 1 13 0 Q16 2 14 7 Q15 12 16 17Z" fill="#d060a0"/><path d="M8 5 Q4 14 7 21 Q9 26 8 31" stroke="#d060a0" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="14" cy="17" rx="3" ry="2.5" fill="#f090c8"/><path d="M43 18 Q48 12 50 5 Q48 1 45 0 Q42 2 44 7 Q43 12 42 17Z" fill="#d060a0"/><path d="M50 5 Q54 14 51 21 Q49 26 50 31" stroke="#d060a0" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="44" cy="17" rx="3" ry="2.5" fill="#f090c8"/><path d="M19 12 Q29 9 39 12" stroke="#f090c8" stroke-width="0.8" fill="none" stroke-linecap="round"/>`
+};
+
+const heads=[
+  {id:'trailer',label:'Trailer',wig:'blackStraight'},
+  {id:'press',label:'Press',wig:'auburnAfro'},
+  {id:'gallery',label:'Gallery',wig:'blueSpiky'},
+  {id:'team',label:'Team',wig:'whiteBob'},
+  {id:'about',label:'About',wig:'blondeCurly'},
+  {id:'contact',label:'Contact',wig:'pinkPigtails'},
+];
+
+function makeSVG(gid,cls,wig){
+  return `<svg class="${cls}" viewBox="0 0 58 80" xmlns="http://www.w3.org/2000/svg">${base(gid)}${wigs[wig]}</svg>`;
+}
+
+const shop=document.getElementById('shop');
+const landing=document.getElementById('landing');
+shop.style.display='none';
+
+// Each head gets random starting position and velocity
+const floaters = heads.map((h,i) => {
+  const cell = document.createElement('div');
+  cell.onclick = () => enterSite(h.id);
+  cell.innerHTML = makeSVG('s'+i,'shead',h.wig)
+    + `<div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(232,220,224,0.45);margin-top:6px;text-align:center;">${h.label}</div>`;
+  cell.style.cssText = `
+    position:absolute;
+    display:flex;flex-direction:column;align-items:center;
+    cursor:pointer;width:90px;z-index:10;
+    transition:filter 0.2s;
+  `;
+  cell.addEventListener('mouseenter', () => {
+    cell.style.filter = 'drop-shadow(0 0 12px rgba(101,154,149,0.8))';
+  });
+  cell.addEventListener('mouseleave', () => {
+    cell.style.filter = 'none';
+  });
+  landing.appendChild(cell);
+
+  // random start position and velocity
+  const speed = 0.1 + Math.random() * 0.08;
+  const angle = Math.random() * Math.PI * 2;
+  return {
+    el: cell,
+    x: Math.random() * (window.innerWidth - 100),
+    y: Math.random() * (window.innerHeight - 130),
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+  };
+});
+
+function animateFloaters() {
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  floaters.forEach(f => {
+    f.x += f.vx;
+    f.y += f.vy;
+    // bounce off edges
+    if (f.x <= 0 || f.x >= W - 100) { f.vx *= -1; f.x = Math.max(0, Math.min(f.x, W - 100)); }
+    if (f.y <= 0 || f.y >= H - 130) { f.vy *= -1; f.y = Math.max(0, Math.min(f.y, H - 130)); }
+    f.el.style.left = f.x + 'px';
+    f.el.style.top  = f.y + 'px';
+  });
+  requestAnimationFrame(animateFloaters);
+}
+requestAnimationFrame(animateFloaters);
+
+const nav=document.getElementById('navinner');
+heads.forEach((h,i)=>{
+  const a=document.createElement('a');
+  a.className='nav-item';
+  a.href='#';
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const el=document.getElementById(h.id);
+    if(el) el.scrollIntoView({behavior:'smooth'});
+  });
+  a.innerHTML=makeSVG('n'+i,'mhead',h.wig)+`<span class="nav-label">${h.label}</span>`;
+  nav.appendChild(a);
+});
+
+function mailtoSubmit(e){
+  e.preventDefault();
+  const f=e.target;
+  const name=f.querySelector('input[type="text"]').value.trim();
+  const email=f.querySelector('input[type="email"]').value.trim();
+  const type=f.querySelector('select').value;
+  const message=f.querySelector('textarea').value.trim();
+  const subject=encodeURIComponent('New inquiry — Do I Know You From Somewhere?');
+  const body=encodeURIComponent(`Name: ${name}\nEmail: ${email}\nInquiry Type: ${type}\n\n${message}`);
+  window.location.href=`mailto:angela@angelawongcarbone.com?subject=${subject}&body=${body}`;
+}
+
+const slides=[
+  {bg:'#1c1d2e',label:'Still 01',caption:'Replace with your image URL'},
+  {bg:'#251820',label:'Still 02',caption:'Replace with your image URL'},
+  {bg:'#181c28',label:'Still 03',caption:'Replace with your image URL'},
+  {bg:'#201c28',label:'Still 04',caption:'Replace with your image URL'},
+  {bg:'#1c2018',label:'Still 05',caption:'Replace with your image URL'},
+  {bg:'#201818',label:'Still 06',caption:'Replace with your image URL'},
+];
+let carIdx=0;
+const track=document.getElementById('carTrack');
+const dotsEl=document.getElementById('carDots');
+slides.forEach((s,i)=>{
+  const slide=document.createElement('div');
+  slide.className='car-slide';
+  slide.onclick=()=>{ if(s.src) window.open(s.src,'_blank'); };
+  slide.style.cursor=s.src?'pointer':'default';
+  const bg=document.createElement('div');
+  bg.className='car-slide-bg';
+  if(s.src){bg.style.backgroundImage=`url(${s.src})`;bg.style.backgroundSize='cover';bg.style.backgroundPosition='center';}
+  else{bg.style.background=s.bg;bg.style.alignItems='center';bg.style.justifyContent='center';bg.innerHTML=`<span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(184,168,200,0.2);">${s.label}</span>`;}
+  const ov=document.createElement('div');
+  ov.className='car-slide-overlay';
+  ov.innerHTML=`<span class="car-open-label">${s.src?'↗ Open Full Size':'Add image src to enable'}</span><span class="car-caption">${s.caption}</span>`;
+  slide.appendChild(bg);slide.appendChild(ov);track.appendChild(slide);
+  const dot=document.createElement('button');
+  dot.className='car-dot'+(i===0?' active':'');
+  dot.onclick=()=>carGoTo(i);
+  dotsEl.appendChild(dot);
+});
+function carGoTo(n){carIdx=(n+slides.length)%slides.length;track.style.transform=`translateX(-${carIdx*100}%)`;document.querySelectorAll('.car-dot').forEach((d,i)=>d.classList.toggle('active',i===carIdx));}
+function carMove(dir){carGoTo(carIdx+dir);}
+document.addEventListener('keydown',e=>{const sec=document.getElementById('gallery');if(!sec)return;const r=sec.getBoundingClientRect();if(r.top<window.innerHeight&&r.bottom>0){if(e.key==='ArrowLeft')carMove(-1);if(e.key==='ArrowRight')carMove(1);}});
+
+function enterSite(target){
+  document.getElementById('landing').style.display='none';
+  document.getElementById('main-site').style.display='block';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(target&&target!=='hero'){const el=document.getElementById(target);if(el)el.scrollIntoView({behavior:'smooth'});}
+    else{window.scrollTo({top:0,behavior:'instant'});}
+  }));
+}
+</script>
+</body>
+</html>
