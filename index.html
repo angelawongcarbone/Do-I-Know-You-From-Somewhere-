@@ -69,6 +69,23 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   opacity:0.88;
   filter:contrast(1.05) brightness(0.92);
 }
+/* tv lightbox with mute button */
+.tv-lightbox{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(10,8,8,0);pointer-events:none;transition:background 0.4s;}
+.tv-lightbox.open{background:rgba(10,8,8,0.88);pointer-events:all;cursor:pointer;}
+.tv-lightbox-inner{position:relative;width:min(680px,90vw);transform:scale(0.3);opacity:0;transition:transform 0.45s cubic-bezier(0.2,0,0.2,1),opacity 0.4s;pointer-events:none;cursor:default;}
+.tv-lightbox.open .tv-lightbox-inner{transform:scale(1);opacity:1;pointer-events:all;}
+.tv-lightbox-inner img.tv-png{width:100%;display:block;}
+.tv-lightbox-inner .tv-gif-overlay{position:absolute;top:6%;left:5%;width:71%;height:82%;overflow:hidden;border-radius:6%/8%;}
+.tv-lightbox-inner .tv-gif-overlay video,.tv-lightbox-inner .tv-gif-overlay img{width:100%;height:100%;object-fit:cover;opacity:0.92;filter:contrast(1.05) brightness(0.95);}
+.tv-lightbox-inner .tv-gif-overlay::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.1) 0px,rgba(0,0,0,0.1) 1px,transparent 1px,transparent 3px);pointer-events:none;z-index:2;}
+.tv-mute-btn{position:absolute;top:69%;right:6%;width:8%;aspect-ratio:1;border-radius:50%;background:#252335;border:1.5px solid #3a3650;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:background 0.2s,box-shadow 0.2s;box-shadow:inset 0 1px 3px rgba(0,0,0,0.6);}
+.tv-mute-btn:hover{background:#3a3050;box-shadow:0 0 8px rgba(101,154,149,0.6),inset 0 1px 3px rgba(0,0,0,0.6);}
+.tv-mute-btn svg{width:55%;height:55%;fill:rgba(232,220,224,0.6);}
+.tv-mute-btn.unmuted{background:#528096;}
+.tv-mute-btn.unmuted svg{fill:#e8dce0;}
+.tv-close-hint{position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(232,220,224,0.4);white-space:nowrap;}
+.footer-tv{cursor:pointer;}
+.footer-tv:hover img.tv-png{filter:brightness(1.1);}  
 /* scanlines over gif */
 .tv-gif-overlay::after{
   content:'';
@@ -425,13 +442,29 @@ footer{text-align:center;padding:60px 24px 48px;border-top:1px solid rgba(184,16
     <!-- TV in footer -->
     <div class="footer-tv">
       <img class="tv-png" src="TV.png" alt="Vintage TV"/>
+      <div class="footer-tv" onclick="openTvLightbox()">
       <div class="tv-gif-overlay">
         <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;">
           <source src="Interrogationroom.mp4" type="video/mp4"/>
         </video>
       </div>
     </div>
-
+    <div class="tv-lightbox" id="tvLightbox" onclick="closeTvLightbox(event)">
+  <div class="tv-lightbox-inner" onclick="event.stopPropagation()">
+    <img class="tv-png" src="TV.png" alt="Vintage TV"/>
+    <div class="tv-gif-overlay">
+      <video id="lbVideo" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;">
+        <source src="your-video.mp4" type="video/mp4"/>
+      </video>
+    </div>
+    <button class="tv-mute-btn" id="muteBtn" onclick="toggleMute()" title="Toggle sound">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="muteIcon">
+        <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div class="tv-close-hint">click outside to close</div>
+  </div>
+</div>
     <div style="border-top:1px solid rgba(184,168,200,0.1);padding-top:28px;">&copy; 2026 &nbsp;·&nbsp; Do I Know You From Somewhere? &nbsp;·&nbsp; All Rights Reserved</div>
   </div>
 </footer>
@@ -599,6 +632,34 @@ function enterSite(target){
     else{window.scrollTo({top:0,behavior:'instant'});}
   }));
 }
+  function openTvLightbox(){
+  document.getElementById('tvLightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeTvLightbox(e){
+  document.getElementById('tvLightbox').classList.remove('open');
+  document.body.style.overflow='';
+  const v=document.getElementById('lbVideo');
+  const btn=document.getElementById('muteBtn');
+  if(v){ v.muted=true; }
+  if(btn){ btn.classList.remove('unmuted'); updateMuteIcon(true); }
+}
+function toggleMute(){
+  const v=document.getElementById('lbVideo');
+  const btn=document.getElementById('muteBtn');
+  if(!v) return;
+  v.muted=!v.muted;
+  btn.classList.toggle('unmuted',!v.muted);
+  updateMuteIcon(v.muted);
+}
+function updateMuteIcon(muted){
+  const icon=document.getElementById('muteIcon');
+  if(!icon) return;
+  icon.innerHTML = muted
+    ? `<path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>`
+    : `<path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeTvLightbox(); });
 </script>
 </body>
 </html>
