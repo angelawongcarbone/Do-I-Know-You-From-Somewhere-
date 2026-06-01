@@ -644,7 +644,7 @@ function enterSite(target){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     if(target&&target!=='hero'){const el=document.getElementById(target);if(el)el.scrollIntoView({behavior:'smooth'});}
     else{window.scrollTo({top:0,behavior:'instant'});}
-  }
+  }));
 }                                                  
 function openTvLightbox(){
   document.getElementById('tvLightbox').classList.add('open');
