@@ -501,6 +501,25 @@ footer{text-align:center;padding:60px 24px 48px;border-top:1px solid rgba(184,16
 </div>
 
 <script>
+  function base(ids){
+  const sk=ids+'sk', nk=ids+'nk';
+  return `<defs>
+    <radialGradient id="${sk}" cx="42%" cy="38%" r="58%"><stop offset="0%" stop-color="#e0d4c8"/><stop offset="100%" stop-color="#b89878"/></radialGradient>
+    <radialGradient id="${nk}" cx="50%" cy="30%" r="60%"><stop offset="0%" stop-color="#ccc0b0"/><stop offset="100%" stop-color="#a88868"/></radialGradient>
+  </defs>
+  <rect x="17" y="73" width="24" height="5" rx="1" fill="#18181e"/>
+  <path d="M9 72 Q13 57 21 54 Q29 52 37 54 Q45 57 49 72Z" fill="url(#${nk})"/>
+  <rect x="23" y="46" width="12" height="13" rx="3" fill="url(#${nk})"/>
+  <ellipse cx="29" cy="31" rx="15" ry="19" fill="url(#${sk})"/>
+  <ellipse cx="24" cy="24" rx="4.5" ry="6.5" fill="rgba(255,255,255,0.07)"/>
+  <ellipse cx="14" cy="32" rx="2" ry="3" fill="#b09070"/>
+  <ellipse cx="44" cy="32" rx="2" ry="3" fill="#b09070"/>
+  <path d="M22 29.5 Q25 28 28 29.5" stroke="#806050" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+  <path d="M30 29.5 Q33 28 36 29.5" stroke="#806050" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+  <path d="M29 31 Q28 35 27 36.5 Q29 37.5 31 36.5 Q30 35 29 31Z" fill="rgba(120,90,65,0.2)"/>
+  <path d="M25 41 Q29 43 33 41" stroke="#907060" stroke-width="1" fill="none" stroke-linecap="round"/>`;
+}
+  
 const wigs = {
   blackStraight:`<image href="WIG3.png" x="-5" y="-5" width="68" height="88" preserveAspectRatio="xMidYMid meet"/>`,
   auburnAfro:`<image href="WIG1.png" x="-5" y="-5" width="68" height="88" preserveAspectRatio="xMidYMid meet"/>`,
