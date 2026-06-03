@@ -271,8 +271,8 @@ footer{text-align:center;padding:60px 24px 48px;border-top:1px solid rgba(184,16
 
 <section id="trailer">
   <h2 class="section-title">Watch the Trailer</h2>
-  <div class="trailer-frame" onclick="this.innerHTML='<iframe width=\'100%\' height=\'100%\' src=\'https://player.vimeo.com/video/1198156132?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1\' frameborder=\'0\' allow=\'autoplay; fullscreen\' allowfullscreen></iframe>'">
-    <div class="play-btn"></div>
+  <div class="trailer-frame" id="trailerFrame">
+    <div class="play-btn" onclick="loadTrailer()"></div>
     <span class="trailer-label">Official Trailer — 0:35</span>
   </div>
 </section>
@@ -610,15 +610,17 @@ heads.forEach((h,i)=>{
 
 function loadTrailer() {
   const frame = document.getElementById('trailerFrame');
-  frame.onclick = null;
   const iframe = document.createElement('iframe');
   iframe.width = '100%';
   iframe.height = '100%';
-  iframe.src = 'https://player.vimeo.com/video/1198156132?badge=0&autopause=0&player_id=0&app_id=58479';
+  iframe.src = 'https://player.vimeo.com/video/1198156132?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1';
   iframe.frameBorder = '0';
   iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; clipboard-write');
   iframe.setAttribute('allowfullscreen', '');
-  iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+  iframe.style.position = 'absolute';
+  iframe.style.top = '0';
+  iframe.style.left = '0';
+  frame.style.position = 'relative';
   frame.innerHTML = '';
   frame.appendChild(iframe);
 }
