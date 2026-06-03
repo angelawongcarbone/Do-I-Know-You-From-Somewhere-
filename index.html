@@ -608,6 +608,20 @@ heads.forEach((h,i)=>{
   nav.appendChild(a);
 });
 
+function loadTrailer() {
+  const frame = document.getElementById('trailerFrame');
+  frame.onclick = null;
+  const iframe = document.createElement('iframe');
+  iframe.width = '100%';
+  iframe.height = '100%';
+  iframe.src = 'https://player.vimeo.com/video/1198156132?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1';
+  iframe.frameBorder = '0';
+  iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+  iframe.allowFullscreen = true;
+  frame.innerHTML = '';
+  frame.appendChild(iframe);
+}
+
 function mailtoSubmit(e){
   e.preventDefault();
   const f=e.target;
