@@ -134,9 +134,9 @@ section{max-width:860px;margin:0 auto;padding:96px 32px;border-top:1px solid rgb
 .trailer-frame:hover .play-btn::after{border-left-color:var(--c-black);}
 .trailer-label{position:absolute;bottom:18px;left:22px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t-dim);z-index:1;}
 
-.press-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px;align-items:start;}
+.press-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px;}
 .press-card{display:flex;flex-direction:column;height:100%;}
-.press-quote{flex:1;}
+.press-quote{flex:1;margin-bottom:12px;}
 .press-card{border:1px solid rgba(184,168,200,0.15);padding:22px;position:relative;}
 .press-card::before{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--c-purple);}
 .press-quote{font-style:italic;font-size:15px;line-height:1.75;color:var(--c-light);margin-bottom:12px;}
@@ -289,13 +289,14 @@ footer{text-align:center;padding:60px 24px 48px;border-top:1px solid rgba(184,16
   </div>
   <div class="screening-list" style="margin-top:56px;">
     <p class="section-label" style="margin-bottom:14px;">Upcoming Screenings</p>
-    <div class="screening-item">
+    <div class="screening-item" style="display:grid;grid-template-columns:200px 1fr;align-items:center;gap:24px;"> <a href="https://tribecafilm.com/films/vital-stories-premiere-2026" target="_blank" style="flex-shrink:0;display:block;transition:filter 0.25s;" 
+     onmouseover="this.style.filter='drop-shadow(0 0 12px rgba(199,102,82,0.8))'" 
+     onmouseout="this.style.filter='none'">
       <div class="screening-date">10 @ 5:30PM<br><span style="font-size:10px;font-family:'Space Mono',monospace;letter-spacing:0.1em;font-weight:400;">JUN</span></div>
       <div><div class="screening-info">Tribeca Film Festival</div><div class="screening-city">New York, NY</div></div>
     </div>
   </div>
-  <div style="margin-top:14px;">
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+  <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
       <div class="award-card" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
         <a href="https://tribecafilm.com/press-center/press-releases/tribeca-studios-and-lilly-announce-winners-of-inaugural-vital-stories-filmmaker-program" target="_blank" style="flex-shrink:0;display:block;transition:filter 0.25s;" 
      onmouseover="this.style.filter='drop-shadow(0 0 12px rgba(199,102,82,0.8))'" 
@@ -311,7 +312,7 @@ footer{text-align:center;padding:60px 24px 48px;border-top:1px solid rgba(184,16
   </div>
 </div>
     </div>
-      <div class="screening-item"><a href="https://hollyshorts2026.eventive.org/schedule/6a57e8417ae888f20c1c574f" target="_blank" class="screening-item-link">
+      <div class="screening-item" style="display:grid;grid-template-columns:200px 1fr;align-items:center;gap:24px;"><a href="https://hollyshorts2026.eventive.org/schedule/6a57e8417ae888f20c1c574f" target="_blank" class="screening-item-link">
       <div class="screening-date">22 @ 5:00PM<br><span style="font-size:10px;font-family:'Space Mono',monospace;letter-spacing:0.1em;font-weight:400;">AUG</span></div>
       <div><div class="screening-info">Hollyshorts Film Festival</div><div class="screening-city">Los Angeles, CA</div></div>
     </div>
